@@ -15,6 +15,7 @@ class CommentController extends Controller
     }
     public function store(Request $request, Post $post)
     {
+        // dd($request->all());
         $comment = $post->comments()->create([
             'body' => $request->body,
             'user_id' => Auth::id()
