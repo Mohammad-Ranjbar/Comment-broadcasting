@@ -16,7 +16,7 @@
         <hr/>
 
         <h3>Comments:</h3>
-        <div style="margin-bottom:50px;" v-if="user">
+        <div style="margin-bottom:50px;" >
             <textarea class="form-control" rows="3" name="body" placeholder="Leave a comment" v-model="commentBox"></textarea>
             <button class="btn btn-success" style="margin-top:10px" @click="postComment()">Save Comment</button>
         </div>
@@ -33,6 +33,7 @@
                     @{{ comment.body }}
                 </p>
                 <span style="color: #aaa;">on @{{ comment.created_at }}</span>
+                <span>{{auth()->user()->createToken('MyApp')->accessToken}} </span>
             </div>
         </div>
     </div>
@@ -48,16 +49,18 @@
 				comments: {},
 				commentBox: '',
 				post: {!! $post->toJson() !!},
-				user: {!! Auth::check() ? Auth::user()->toJson() : 'null' !!}
+				user: {!! Auth::check() ? Auth::user()->toJson() : 'null' !!},
 			},
 			mounted() {
 				this.getComments();
+
 			},
 			methods: {
 				getComments() {
 					axios.get('/api/posts/' + this.post.id + '/comments')
 						.then((response) => {
 							this.comments = response.data;
+
 						})
 						.catch(function (error) {
 							console.log(error);
@@ -67,7 +70,7 @@
 					axios.post('/api/posts/' + this.post.id + '/comments', { body: this.commentBox }, {
 						headers:
 							{
-								'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjJkNTJhMzdlOWE5OTZhNTAxMDg4MGFlMWExMDkzNTAwYzQ3ZTE1YTY4NGY2YzFiMmNiYzBlNjQ5ODZmNTFlYTMzNzhiNjcwY2JiZGIzYTg1In0.eyJhdWQiOiIxIiwianRpIjoiMmQ1MmEzN2U5YTk5NmE1MDEwODgwYWUxYTEwOTM1MDBjNDdlMTVhNjg0ZjZjMWIyY2JjMGU2NDk4NmY1MWVhMzM3OGI2NzBjYmJkYjNhODUiLCJpYXQiOjE1NzU3MDI2MTYsIm5iZiI6MTU3NTcwMjYxNiwiZXhwIjoxNjA3MzI1MDE2LCJzdWIiOiIzIiwic2NvcGVzIjpbXX0.IPuJ1n5XNbbh1Czcn4wmQT9upTs_ZaZIX-wM6TV0qffCxL5m4J3ssZAk5wVmU_a6AwHmVlv3xSUt2vC3yPVCFTVIF_V6hJm7xJHcHrsEgkwkHtlyrVP97Icqj18jh0SqOZrixvGsgKezZUakhrYg_LLhrb1j8cPzm-rijlL0Rqtv3Rnw6op9tBqwHA-fMRQBLfp5pEx7ufdGbNuwQwkKVU3erKXNZR0VMxjG36LRU0PC_7AxXetWlnoJ2NhKBLAGU2zPh1fwzM8QaZJ2wVDBV0uu07GcYE55MGM-P_XiM-Tm82XBWuzssaNejPC3uYIXJ6oz22eWF9m9NKjYNyvLR0lswhJ_Dq-xBszvhvjEGJYl2ILM9vFUqcA-HjooaS22XviL2IHO1lCbwqEPK9TKOJuIb7x1pNec4eFYSrdQUGTpyYfSO3mo4of76ZOuQ1J0tF7MV-_BPsfvozFBzL89UDtyQg8i-AfQ-c2j1BWUYvceDzEr4_IH5AhcCK3ik_hjHJQiFXDhEgmn7DGnHJe-UWQoC_vVIXRDnFBf-G33NnaeMnPSVBVfCpIQU4v_ihqBO0W3bSTmuoIei2spThX6eQFmM1S8JfD4czk-uh4SV8Qdqxp9SW1ogl4SuA5R2rMr7IX8_8kEjuquY3UpzDXh9LmZuJkrjBVq5BpY17RjT3M',
+								'Authorization': 'Bearer ' + this.tokenize,
 							},
 					})
 						.then((response) => {
