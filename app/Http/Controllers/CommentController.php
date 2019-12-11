@@ -11,8 +11,8 @@ class CommentController extends Controller
 {
     public function index(Post $post)
     {
-        // return response()->json($post->comments()->with('user')->latest()->get());
-        return $post->comments()->with('user')->latest()->get();
+        return response()->json($post->comments()->with('user')->get());
+        // return $post->comments()->with('user')->latest()->get();
     }
     public function store(Request $request, Post $post)
     {

@@ -9,6 +9,6 @@ Route::group(['middleware' => 'auth:api'], function () {
 });
 
 Route::get('/posts/{post}/comments', 'CommentController@index');
-Route::middleware('auth:api')->group(function () {
+Route::middleware('auth')->group(function () {
     Route::post('/posts/{post}/comments', 'CommentController@store');
 });
