@@ -1877,6 +1877,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -1918,7 +1923,7 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
     listen: function listen() {
       var _this3 = this;
 
-      Echo.channel('post.' + this.post.id).listen('NewComment', function (comment) {
+      Echo["private"]('post.' + this.post.id).listen('NewComment', function (comment) {
         _this3.comments.unshift(comment);
       });
     }
@@ -66336,43 +66341,53 @@ var render = function() {
       _vm._v(" "),
       _c("h3", [_vm._v("Comments:")]),
       _vm._v(" "),
-      _c("div", { staticStyle: { "margin-bottom": "50px" } }, [
-        _c("textarea", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.commentBox,
-              expression: "commentBox"
-            }
-          ],
-          staticClass: "form-control",
-          attrs: { rows: "3", name: "body", placeholder: "Leave a comment" },
-          domProps: { value: _vm.commentBox },
-          on: {
-            input: function($event) {
-              if ($event.target.composing) {
-                return
+      _vm.user
+        ? _c("div", { staticStyle: { "margin-bottom": "50px" } }, [
+            _c("textarea", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.commentBox,
+                  expression: "commentBox"
+                }
+              ],
+              staticClass: "form-control",
+              attrs: {
+                rows: "3",
+                name: "body",
+                placeholder: "Leave a comment"
+              },
+              domProps: { value: _vm.commentBox },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.commentBox = $event.target.value
+                }
               }
-              _vm.commentBox = $event.target.value
-            }
-          }
-        }),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-success",
-            staticStyle: { "margin-top": "10px" },
-            on: {
-              click: function($event) {
-                return _vm.postComment()
-              }
-            }
-          },
-          [_vm._v("Save Comment")]
-        )
-      ]),
+            }),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-success",
+                staticStyle: { "margin-top": "10px" },
+                on: {
+                  click: function($event) {
+                    return _vm.postComment()
+                  }
+                }
+              },
+              [_vm._v("Save Comment")]
+            )
+          ])
+        : _c("div", [
+            _c("h4", [_vm._v("you must logged in to submit a comment ...")]),
+            _vm._v(" "),
+            _c("a", { attrs: { href: "/login" } }, [_vm._v("Login Now >>")])
+          ]),
       _vm._v(" "),
       _vm._l(_vm.comments, function(comment) {
         return _c(
@@ -66397,7 +66412,9 @@ var render = function() {
               _vm._v(" "),
               _c("span", { staticStyle: { color: "#AAA" } }, [
                 _vm._v("on " + _vm._s(_vm.moment(comment.created_at).fromNow()))
-              ])
+              ]),
+              _vm._v(" "),
+              _c("span", [_vm._v(_vm._s(_vm.moment().calendar()))])
             ])
           ]
         )

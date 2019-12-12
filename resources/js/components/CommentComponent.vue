@@ -12,9 +12,13 @@
         <hr/>
 
         <h3>Comments:</h3>
-        <div style="margin-bottom:50px;">
+        <div style="margin-bottom:50px;" v-if="user">
             <textarea class="form-control" rows="3" name="body" placeholder="Leave a comment" v-model="commentBox"></textarea>
             <button class="btn btn-success" style="margin-top:10px" @click="postComment()">Save Comment</button>
+        </div>
+        <div v-else>
+            <h4>you must logged in to submit a comment ...</h4>
+            <a href="/login">Login Now &gt;&gt;</a>
         </div>
 
         <div class="media " style="margin-top:20px; background-color: #F3EEF1" v-for="comment in comments">
@@ -31,6 +35,7 @@
                 </p>
                 <!--                <span style="color: #AAA;">on @{{ comment.created_at }}</span>-->
                 <span style="color: #AAA;">on {{ moment(comment.created_at).fromNow() }}</span>
+                <span>{{moment().calendar()}}</span>
 
             </div>
         </div>
@@ -80,7 +85,7 @@
 					});
 			},
 			listen() {
-				Echo.channel('post.' + this.post.id)
+				Echo.private('post.' + this.post.id)
 					.listen('NewComment', (comment) => {
 						this.comments.unshift(comment);
 					});
