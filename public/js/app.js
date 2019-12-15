@@ -1882,15 +1882,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
-
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['user', 'post'],
   data: function data() {
     return {
       comments: {},
-      commentBox: '',
-      moment: moment
+      commentBox: ''
     };
   },
   mounted: function mounted() {
@@ -66410,11 +66407,11 @@ var render = function() {
                 )
               ]),
               _vm._v(" "),
-              _c("span", { staticStyle: { color: "#AAA" } }, [
-                _vm._v("on " + _vm._s(_vm.moment(comment.created_at).fromNow()))
-              ]),
-              _vm._v(" "),
-              _c("span", [_vm._v(_vm._s(_vm.moment().calendar()))])
+              _c(
+                "span",
+                { staticStyle: { color: "#AAA" }, attrs: { dir: "rtl" } },
+                [_vm._v(" " + _vm._s(_vm._f("mydate")(comment.created_at)))]
+              )
             ])
           ]
         )
@@ -79651,9 +79648,13 @@ module.exports = function(module) {
 /*!*****************************!*\
   !*** ./resources/js/app.js ***!
   \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_0__);
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -79662,6 +79663,10 @@ module.exports = function(module) {
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+
+Vue.filter('mydate', function (create) {
+  return moment__WEBPACK_IMPORTED_MODULE_0___default()(create).local('fa').fromNow();
+});
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue

@@ -34,8 +34,8 @@
                     {{ comment.body }}
                 </p>
                 <!--                <span style="color: #AAA;">on @{{ comment.created_at }}</span>-->
-                <span style="color: #AAA;">on {{ moment(comment.created_at).fromNow() }}</span>
-                <span>{{moment().calendar()}}</span>
+                <span style="color: #AAA;" dir="rtl"> {{ comment.created_at | mydate  }}</span>
+
 
             </div>
         </div>
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-	var moment = require('moment');
+
 	export default {
 
 		props: ['user', 'post'],
@@ -51,13 +51,14 @@
 			return {
 				comments: {},
 				commentBox: '',
-				moment: moment,
+
+
 			};
 		},
 
 		mounted() {
 			this.getComments();
-            this.listen();
+			this.listen();
 
 		},
 		methods: {
@@ -88,7 +89,10 @@
 				Echo.private('post.' + this.post.id)
 					.listen('NewComment', (comment) => {
 						this.comments.unshift(comment);
-					});
+					})
+
+                ;
+
 			},
 		},
 	};

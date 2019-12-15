@@ -7,8 +7,11 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+import moment from 'moment';
+Vue.filter('mydate', (create) => {
 
-
+   return moment(create).local('fa').fromNow();
+});
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
