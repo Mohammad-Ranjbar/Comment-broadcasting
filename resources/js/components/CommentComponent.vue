@@ -1,6 +1,10 @@
 <template>
     <div class="container">
-
+        <ul>
+            <legend>online user :</legend>
+            <li v-for="online in onlines">{{online.name}}</li>
+        </ul>
+        <br><br>
         <span class="label label-success" style="margin-left:15px;" v-if="post.published">Published</span>
 
         <span class="label label-default" style="margin-left:15px;" v-else>Draft</span>
@@ -36,7 +40,6 @@
                 <!--                <span style="color: #AAA;">on @{{ comment.created_at }}</span>-->
                 <span style="color: #AAA;" dir="rtl"> {{ comment.created_at | mydate  }}</span>
 
-
             </div>
         </div>
     </div>
@@ -51,7 +54,7 @@
 			return {
 				comments: {},
 				commentBox: '',
-
+				onlines: {},
 
 			};
 		},
@@ -59,7 +62,10 @@
 		mounted() {
 			this.getComments();
 			this.listen();
-
+			Echo.join('online')
+				.here(users => (this.onlines = users))
+				.joining(user => this.onlines.push(user))
+				.leaving(user => (this.onlines = this.onlines.filter(u => (u.id !== user.id))));
 		},
 		methods: {
 
@@ -68,11 +74,11 @@
 				axios.get('/api/posts/' + this.post.id + '/comments')
 					.then((response) => {
 						this.comments = response.data;
-
 					})
 					.catch(function (error) {
 						console.log(error);
 					});
+
 			},
 			postComment() {
 
@@ -89,9 +95,7 @@
 				Echo.private('post.' + this.post.id)
 					.listen('NewComment', (comment) => {
 						this.comments.unshift(comment);
-					})
-
-                ;
+					});
 
 			},
 		},

@@ -1882,46 +1882,61 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['user', 'post'],
   data: function data() {
     return {
       comments: {},
-      commentBox: ''
+      commentBox: '',
+      onlines: {}
     };
   },
   mounted: function mounted() {
+    var _this = this;
+
     this.getComments();
     this.listen();
+    Echo.join('online').here(function (users) {
+      return _this.onlines = users;
+    }).joining(function (user) {
+      return _this.onlines.push(user);
+    }).leaving(function (user) {
+      return _this.onlines = _this.onlines.filter(function (u) {
+        return u.id !== user.id;
+      });
+    });
   },
   methods: {
     getComments: function getComments() {
-      var _this = this;
+      var _this2 = this;
 
       axios.get('/api/posts/' + this.post.id + '/comments').then(function (response) {
-        _this.comments = response.data;
+        _this2.comments = response.data;
       })["catch"](function (error) {
         console.log(error);
       });
     },
     postComment: function postComment() {
-      var _this2 = this;
+      var _this3 = this;
 
       axios.post('/posts/' + this.post.id + '/comments', {
         body: this.commentBox
       }).then(function (response) {
-        _this2.comments.unshift(response.data);
+        _this3.comments.unshift(response.data);
 
-        _this2.commentBox = '';
+        _this3.commentBox = '';
       })["catch"](function (error) {
         console.log(error);
       });
     },
     listen: function listen() {
-      var _this3 = this;
+      var _this4 = this;
 
       Echo["private"]('post.' + this.post.id).listen('NewComment', function (comment) {
-        _this3.comments.unshift(comment);
+        _this4.comments.unshift(comment);
       });
     }
   }
@@ -66310,6 +66325,21 @@ var render = function() {
     "div",
     { staticClass: "container" },
     [
+      _c(
+        "ul",
+        [
+          _c("legend", [_vm._v("online user :")]),
+          _vm._v(" "),
+          _vm._l(_vm.onlines, function(online) {
+            return _c("li", [_vm._v(_vm._s(online.name))])
+          })
+        ],
+        2
+      ),
+      _vm._v(" "),
+      _c("br"),
+      _c("br"),
+      _vm._v(" "),
       _vm.post.published
         ? _c(
             "span",

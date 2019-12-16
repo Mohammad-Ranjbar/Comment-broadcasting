@@ -12,7 +12,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-class NewComment implements ShouldBroadcastNow
+class NewComment implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $comment;
@@ -41,7 +41,7 @@ class NewComment implements ShouldBroadcastNow
     {
         return [
             'body'       => $this->comment->body,
-            'created_at' => $this->comment->created_at->toFormattedDateString(),
+            'created_at' => $this->comment->created_at,
             'user'       => [
                 'name'   => $this->comment->user->name,
                 'avatar' => 'http://lorempixel/50/50',
