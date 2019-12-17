@@ -15,7 +15,8 @@ class UserController extends Controller
 
     public function search()
     {
-        $query = Input::get('query');
+        // $query = Input::get('query');
+        $query = request('query');
         $users = User::where('name', 'like', '%' . $query . '%')->get();
 
         return response()->json($users);
