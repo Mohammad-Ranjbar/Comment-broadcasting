@@ -1945,6 +1945,9 @@ __webpack_require__.r(__webpack_exports__);
       }).listenForWhisper('typing', function (response) {
         console.log('is type');
         _this4.typing = response;
+        setTimeout(function () {
+          _this4.typing = false;
+        }, 2000);
       });
     },
     isTyping: function isTyping() {

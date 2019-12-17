@@ -65,7 +65,6 @@
 			this.getComments();
 			this.listen();
 			this.listUser();
-		
 		},
 		methods: {
 
@@ -105,7 +104,9 @@
 					.listenForWhisper('typing', response => {
 						console.log('is type');
 						this.typing = response;
-
+                        setTimeout( () => {
+                        	this.typing = false
+                        },2000)
 					});
 			},
 			isTyping() {
