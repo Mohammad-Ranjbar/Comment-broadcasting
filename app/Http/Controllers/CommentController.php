@@ -15,6 +15,10 @@ class CommentController extends Controller
         return response()->json($post->comments()->with('user')->latest()->get());
         // return $post->comments()->with('user')->latest()->get();
     }
+    public function delete($id)
+    {
+        Comment::find($id)->delete();
+    }
 
     public function store(Request $request, Post $post)
     {

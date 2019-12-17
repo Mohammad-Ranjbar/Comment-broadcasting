@@ -1886,6 +1886,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['user', 'post'],
   data: function data() {
@@ -1910,6 +1912,15 @@ __webpack_require__.r(__webpack_exports__);
       })["catch"](function (error) {
         console.log(error);
       });
+    },
+    deleteComment: function deleteComment(id) {
+      axios["delete"]('/posts/comment/' + id, {
+        data: {
+          id: "id"
+        }
+      }).then(this.comments = this.comments.filter(function (u) {
+        return u.id !== id;
+      }));
     },
     postComment: function postComment() {
       var _this2 = this;
@@ -66462,7 +66473,22 @@ var render = function() {
                 "span",
                 { staticStyle: { color: "#AAA" }, attrs: { dir: "rtl" } },
                 [_vm._v(" " + _vm._s(_vm._f("mydate")(comment.created_at)))]
-              )
+              ),
+              _vm._v(" "),
+              comment.user.id == _vm.user.id
+                ? _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-sm btn-danger float-right",
+                      on: {
+                        click: function($event) {
+                          return _vm.deleteComment(comment.id)
+                        }
+                      }
+                    },
+                    [_vm._v("delete")]
+                  )
+                : _vm._e()
             ])
           ]
         )

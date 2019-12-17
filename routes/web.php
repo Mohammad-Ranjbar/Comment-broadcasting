@@ -21,3 +21,4 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::resource('/posts', 'PostController');
 Route::post('/posts/{post}/comments', 'CommentController@store');
+Route::delete('/posts/comment/{id}','CommentController@delete');
