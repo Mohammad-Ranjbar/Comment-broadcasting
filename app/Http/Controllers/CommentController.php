@@ -18,6 +18,7 @@ class CommentController extends Controller
     public function delete($id)
     {
         Comment::find($id)->delete();
+
     }
 
     public function store(Request $request, Post $post)

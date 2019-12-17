@@ -24,6 +24,7 @@ Vue.filter('mydate', (create) => {
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
 
 Vue.component('Comment', require('./components/CommentComponent.vue').default);
+Vue.component('autocomplete', require('./components/AutoCompleteComponent.vue').default);
 Vue.component(
     'passport-clients',
     require('./components/passport/Clients.vue').default,
