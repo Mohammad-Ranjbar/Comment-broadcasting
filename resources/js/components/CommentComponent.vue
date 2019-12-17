@@ -16,8 +16,9 @@
         <hr/>
 
         <h3>Comments:</h3>
+        <span v-if="typing">{{typing.name}} is typing ...</span>
         <div style="margin-bottom:50px;" v-if="user">
-            <textarea class="form-control" rows="3" name="body" placeholder="Leave a comment" v-model="commentBox"></textarea>
+            <textarea class="form-control" rows="3" name="body" placeholder="Leave a comment" v-model="commentBox" @keydown="isTyping()"></textarea>
             <button class="btn btn-success" style="margin-top:10px" @click="postComment()">Save Comment</button>
         </div>
         <div v-else>
@@ -55,6 +56,7 @@
 				comments: {},
 				commentBox: '',
 				onlines: {},
+				typing: false,
 
 			};
 		},
@@ -62,10 +64,8 @@
 		mounted() {
 			this.getComments();
 			this.listen();
-			Echo.join('online')
-				.here(users => (this.onlines = users))
-				.joining(user => this.onlines.push(user))
-				.leaving(user => (this.onlines = this.onlines.filter(u => (u.id !== user.id))));
+			this.listUser();
+		
 		},
 		methods: {
 
@@ -96,8 +96,23 @@
 					.listen('NewComment', (comment) => {
 						this.comments.unshift(comment);
 					});
-
 			},
+			listUser() {
+				Echo.join('online')
+					.here(users => (this.onlines = users))
+					.joining(user => this.onlines.push(user))
+					.leaving(user => (this.onlines = this.onlines.filter(u => (u.id !== user.id))))
+					.listenForWhisper('typing', response => {
+						console.log('is type');
+						this.typing = response;
+
+					});
+			},
+			isTyping() {
+				Echo.join('online')
+					.whisper('typing', this.user);
+			},
+
 		},
 	};
 </script>

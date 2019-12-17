@@ -1885,59 +1885,70 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['user', 'post'],
   data: function data() {
     return {
       comments: {},
       commentBox: '',
-      onlines: {}
+      onlines: {},
+      typing: false
     };
   },
   mounted: function mounted() {
-    var _this = this;
-
     this.getComments();
     this.listen();
-    Echo.join('online').here(function (users) {
-      return _this.onlines = users;
-    }).joining(function (user) {
-      return _this.onlines.push(user);
-    }).leaving(function (user) {
-      return _this.onlines = _this.onlines.filter(function (u) {
-        return u.id !== user.id;
-      });
-    });
+    this.listUser();
   },
   methods: {
     getComments: function getComments() {
-      var _this2 = this;
+      var _this = this;
 
       axios.get('/api/posts/' + this.post.id + '/comments').then(function (response) {
-        _this2.comments = response.data;
+        _this.comments = response.data;
       })["catch"](function (error) {
         console.log(error);
       });
     },
     postComment: function postComment() {
-      var _this3 = this;
+      var _this2 = this;
 
       axios.post('/posts/' + this.post.id + '/comments', {
         body: this.commentBox
       }).then(function (response) {
-        _this3.comments.unshift(response.data);
+        _this2.comments.unshift(response.data);
 
-        _this3.commentBox = '';
+        _this2.commentBox = '';
       })["catch"](function (error) {
         console.log(error);
       });
     },
     listen: function listen() {
-      var _this4 = this;
+      var _this3 = this;
 
       Echo["private"]('post.' + this.post.id).listen('NewComment', function (comment) {
-        _this4.comments.unshift(comment);
+        _this3.comments.unshift(comment);
       });
+    },
+    listUser: function listUser() {
+      var _this4 = this;
+
+      Echo.join('online').here(function (users) {
+        return _this4.onlines = users;
+      }).joining(function (user) {
+        return _this4.onlines.push(user);
+      }).leaving(function (user) {
+        return _this4.onlines = _this4.onlines.filter(function (u) {
+          return u.id !== user.id;
+        });
+      }).listenForWhisper('typing', function (response) {
+        console.log('is type');
+        _this4.typing = response;
+      });
+    },
+    isTyping: function isTyping() {
+      Echo.join('online').whisper('typing', this.user);
     }
   }
 });
@@ -66368,6 +66379,10 @@ var render = function() {
       _vm._v(" "),
       _c("h3", [_vm._v("Comments:")]),
       _vm._v(" "),
+      _vm.typing
+        ? _c("span", [_vm._v(_vm._s(_vm.typing.name) + " is typing ...")])
+        : _vm._e(),
+      _vm._v(" "),
       _vm.user
         ? _c("div", { staticStyle: { "margin-bottom": "50px" } }, [
             _c("textarea", {
@@ -66387,6 +66402,9 @@ var render = function() {
               },
               domProps: { value: _vm.commentBox },
               on: {
+                keydown: function($event) {
+                  return _vm.isTyping()
+                },
                 input: function($event) {
                   if ($event.target.composing) {
                     return
