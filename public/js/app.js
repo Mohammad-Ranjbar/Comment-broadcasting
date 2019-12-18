@@ -1944,14 +1944,26 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['user', 'post'],
   data: function data() {
     return {
-      comments: {},
+      comments: [],
       commentBox: '',
       onlines: {},
-      typing: false
+      typing: false,
+      edit: {},
+      editComment: ''
     };
   },
   mounted: function mounted() {
@@ -1960,60 +1972,74 @@ __webpack_require__.r(__webpack_exports__);
     this.listUser();
   },
   methods: {
-    getComments: function getComments() {
+    enableUpdate: function enableUpdate(id) {
+      this.edit = id;
+    },
+    updateComment: function updateComment(index, id) {
       var _this = this;
 
+      axios.patch('/posts/comments/' + id, {
+        body: this.editComment
+      }).then(function (response) {
+        _this.comments[index] = response.data;
+      });
+      this.edit = {};
+      this.getComments();
+    },
+    getComments: function getComments() {
+      var _this2 = this;
+
       axios.get('/api/posts/' + this.post.id + '/comments').then(function (response) {
-        _this.comments = response.data;
+        _this2.comments = response.data;
       })["catch"](function (error) {
         console.log(error);
       });
     },
-    deleteComment: function deleteComment(id) {
+    deleteComment: function deleteComment(name, id) {
       axios["delete"]('/posts/comment/' + id, {
         data: {
-          id: "id"
+          id: 'id'
         }
       }).then(this.comments = this.comments.filter(function (u) {
         return u.id !== id;
       }));
     },
     postComment: function postComment() {
-      var _this2 = this;
+      var _this3 = this;
 
       axios.post('/posts/' + this.post.id + '/comments', {
         body: this.commentBox
       }).then(function (response) {
-        _this2.comments.unshift(response.data);
+        _this3.comments.unshift(response.data);
 
-        _this2.commentBox = '';
+        _this3.commentBox = '';
       })["catch"](function (error) {
         console.log(error);
       });
     },
     listen: function listen() {
-      var _this3 = this;
+      var _this4 = this;
 
       Echo["private"]('post.' + this.post.id).listen('NewComment', function (comment) {
-        _this3.comments.unshift(comment);
+        _this4.comments.unshift(comment);
       });
     },
     listUser: function listUser() {
-      var _this4 = this;
+      var _this5 = this;
 
       Echo.join('online').here(function (users) {
-        return _this4.onlines = users;
+        return _this5.onlines = users;
       }).joining(function (user) {
-        return _this4.onlines.push(user);
+        return _this5.onlines.push(user);
       }).leaving(function (user) {
-        return _this4.onlines = _this4.onlines.filter(function (u) {
+        return _this5.onlines = _this5.onlines.filter(function (u) {
           return u.id !== user.id;
         });
       }).listenForWhisper('typing', function (response) {
         console.log('is type');
-        _this4.typing = response;
+        _this5.typing = response;
         setTimeout(function () {
-          _this4.typing = false;
+          _this5.typing = false;
         }, 2000);
       });
     },
@@ -9309,7 +9335,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.fade-enter-active[data-v-dfa2840c], .fade-leave-active[data-v-dfa2840c] {\n    -webkit-transition: opacity .5s;\n    transition: opacity .5s;\n}\n.fade-enter[data-v-dfa2840c], .fade-leave-to[data-v-dfa2840c] /* .fade-leave-active below version 2.1.8 */ {\n    opacity: 0;\n}\n", ""]);
+exports.push([module.i, "\n.fade-enter-active[data-v-dfa2840c], .fade-leave-active[data-v-dfa2840c] {\n    -webkit-transition: opacity .5s;\n    transition: opacity .5s;\n}\n\n", ""]);
 
 // exports
 
@@ -66629,7 +66655,7 @@ var render = function() {
             _c("a", { attrs: { href: "/login" } }, [_vm._v("Login Now >>")])
           ]),
       _vm._v(" "),
-      _vm._l(_vm.comments, function(comment) {
+      _vm._l(_vm.comments, function(comment, index) {
         return _c(
           "div",
           {
@@ -66644,11 +66670,52 @@ var render = function() {
                 _vm._v(" " + _vm._s(comment.user.name) + " said ... ")
               ]),
               _vm._v(" "),
-              _c("p", [
-                _vm._v(
-                  "\n                " + _vm._s(comment.body) + "\n            "
-                )
-              ]),
+              _vm.edit !== comment.id
+                ? _c("p", [
+                    _vm._v(
+                      "\n                " +
+                        _vm._s(comment.body) +
+                        "\n            "
+                    )
+                  ])
+                : _c("div", [
+                    _c("textarea", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.editComment,
+                          expression: "editComment"
+                        }
+                      ],
+                      attrs: { name: "", id: "", cols: "60", rows: "5" },
+                      domProps: {
+                        value: _vm.editComment,
+                        textContent: _vm._s(comment.body)
+                      },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.editComment = $event.target.value
+                        }
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn  btn-primary",
+                        on: {
+                          click: function($event) {
+                            return _vm.updateComment(index, comment.id)
+                          }
+                        }
+                      },
+                      [_vm._v("ok")]
+                    )
+                  ]),
               _vm._v(" "),
               _c(
                 "span",
@@ -66667,7 +66734,22 @@ var render = function() {
                         }
                       }
                     },
-                    [_vm._v("delete")]
+                    [_vm._v("delete\n            ")]
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              comment.user.id == _vm.user.id
+                ? _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-sm btn-warning float-right",
+                      on: {
+                        click: function($event) {
+                          return _vm.enableUpdate(comment.id)
+                        }
+                      }
+                    },
+                    [_vm._v("update\n            ")]
                   )
                 : _vm._e()
             ])

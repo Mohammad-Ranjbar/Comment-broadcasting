@@ -23,3 +23,5 @@ Route::get('/users/search', 'UserController@search');
 Route::resource('/posts', 'PostController');
 Route::post('/posts/{post}/comments', 'CommentController@store');
 Route::delete('/posts/comment/{id}','CommentController@delete');
+
+Route::patch('/posts/comments/{id}','CommentController@update');

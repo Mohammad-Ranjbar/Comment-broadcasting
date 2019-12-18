@@ -27,7 +27,7 @@
             <a href="/login">Login Now &gt;&gt;</a>
         </div>
 
-        <div class="media " style="margin-top:20px; background-color: #F3EEF1" v-for="comment in comments">
+        <div class="media " style="margin-top:20px; background-color: #F3EEF1" v-for="(comment , index) in comments">
             <div class="media-left mx-3">
 
                 <a href="#">
@@ -35,14 +35,24 @@
                 </a>
             </div>
             <div class="media-body">
+
                 <h4 class="media-heading "> {{comment.user.name}} said ... </h4>
-                <p>
+
+                <p v-if="edit !== comment.id">
                     {{ comment.body }}
                 </p>
+                <div v-else>
+                    <textarea name="" id="" cols="60" rows="5" v-model="editComment" v-text="comment.body"></textarea>
+                    <button class="btn  btn-primary" @click="updateComment(index , comment.id)">ok</button>
+                </div>
 
-                <!--                <span style="color: #AAA;">on @{{ comment.created_at }}</span>-->
                 <span style="color: #AAA;" dir="rtl"> {{ comment.created_at | mydate  }}</span>
-                <button class="btn btn-sm btn-danger float-right" v-if="comment.user.id == user.id" @click="deleteComment(comment.id)">delete</button>
+                <button class="btn btn-sm btn-danger float-right" v-if="comment.user.id == user.id"
+                        @click="deleteComment(comment.id)">delete
+                </button>
+                <button class="btn btn-sm btn-warning float-right" v-if="comment.user.id == user.id "
+                        @click="enableUpdate(comment.id)">update
+                </button>
             </div>
         </div>
     </div>
@@ -55,11 +65,12 @@
 		props: ['user', 'post'],
 		data() {
 			return {
-				comments: {},
+				comments: [],
 				commentBox: '',
 				onlines: {},
 				typing: false,
-
+				edit: {},
+                editComment:''
 			};
 		},
 
@@ -69,7 +80,20 @@
 			this.listUser();
 		},
 		methods: {
+			enableUpdate(id) {
+				this.edit = id;
+			},
+			updateComment(index, id) {
 
+				axios.patch('/posts/comments/' + id, {  body: this.editComment})
+					.then(response => {
+								this.comments[index] = response.data;
+						},
+					);
+				this.edit = {};
+				this.getComments();
+
+			},
 			getComments() {
 
 				axios.get('/api/posts/' + this.post.id + '/comments')
@@ -81,12 +105,13 @@
 					});
 
 			},
-			deleteComment(id) {
-                axios.delete('/posts/comment/'+id,{data:{id : "id"}})
-                    .then(
-	                    this.comments = this.comments.filter(u => (u.id !== id))
-                    );
+			deleteComment(name, id) {
+				axios.delete('/posts/comment/' + id, { data: { id: 'id' } })
+					.then(
+						this.comments = this.comments.filter(u => (u.id !== id)),
+					);
 			},
+
 			postComment() {
 
 				axios.post('/posts/' + this.post.id + '/comments', { body: this.commentBox })

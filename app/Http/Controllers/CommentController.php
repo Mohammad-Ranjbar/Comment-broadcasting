@@ -21,6 +21,15 @@ class CommentController extends Controller
 
     }
 
+    public function update($id , Request $request)
+    {
+       Comment::find($id)->update([
+            'body' => $request->body
+        ]);
+        $comment = Comment::find($id);
+       return $comment;
+    }
+
     public function store(Request $request, Post $post)
     {
 
