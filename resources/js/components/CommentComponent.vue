@@ -28,8 +28,10 @@
             <a href="/login">Login Now &gt;&gt;</a>
         </div>
 
-        <div class="media " style="margin-top:20px; background-color: #F3EEF1" v-for="(comment , index) in comments" v-if="comment.children.length">
-            <div class="media-left mx-3" >
+        <div class="media " style="margin-top:20px; background-color: #F3EEF1" v-for="(comment , index) in comments"
+           v-if="typeof(comment.parent_id) !== 'number'" >
+            {{typeof(comment.parent_id)}}
+            <div class="media-left mx-3">
 
                 <a href="#">
                     <img class="media-object" src="http://placeimg.com/80/80" alt="...">
@@ -62,12 +64,23 @@
                         @click="enableUpdate(comment.id)">update
                 </button>
                 <button class="btn btn-success" @click="replyEnable(comment.id)">reply</button>
-                <div class="col-md-6 border border-dark" v-if="reply !== comment.id" v-for="child in comment.children">
-                    {{child.body}}
+                <div class="media" v-for="child in comment.children">
+                    <div class="media-left mx-3">
+
+                        <a href="#">
+                            <img class="media-object" src="http://placeimg.com/80/80" alt="...">
+                        </a>
+                    </div>
+                <div class="media-body">
+                    <div class="media-heading">{{child.user.name}}</div>
+                    <p class="float-left">{{child.body}}</p>
+                    <span class="float-right">{{child.created_at | mydate}}</span>
                 </div>
-                <div v-else>
-                    <textarea name="reply" id="reply" cols="80" rows="5" v-model="replyComment" ></textarea>
-                    <button class="btn btn-success" @click="ReplyCm(comment.id)">ok</button>
+
+                </div>
+                <div v-if="reply == comment.id">
+                    <textarea name="reply" id="reply" cols="80" rows="5" v-model="replyComment"></textarea>
+                    <button class="btn btn-success" @click="ReplyCm(comment.id , index) ">ok</button>
 
                 </div>
             </div>
@@ -90,7 +103,7 @@
 				edit: {},
 				editComment: '',
 				reply: {},
-                replyComment:''
+				replyComment: '',
 			};
 		},
 
@@ -101,15 +114,17 @@
 
 		},
 		methods: {
-			ReplyCm(id){
-				axios.post('/reply/' + id , { body: this.replyComment })
+
+			ReplyCm(id, index) {
+				axios.post('/reply/' + id, { body: this.replyComment })
 					.then((response) => {
-						this.replyComment = '';
+						this.comments[index].children.push(response.data);
 					})
 					.catch((error) => {
 						console.log(error);
 					});
-            },
+				this.replyComment = '';
+			},
 			replyEnable(id) {
 				this.reply = id;
 			},
@@ -118,20 +133,14 @@
 
 			},
 			updateComment(index, id) {
-
 				this.comments[index].body = this.editComment;
-
 				axios.patch('/posts/comments/' + id, { body: this.editComment });
-
 				this.edit = {};
-				console.log(index);
-
 			},
 			cancelComment() {
 				this.edit = {};
 			},
 			getComments() {
-
 				axios.get('/api/posts/' + this.post.id + '/comments')
 					.then((response) => {
 						this.comments = response.data;

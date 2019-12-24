@@ -13,7 +13,7 @@ class CommentController extends Controller
 {
     public function index(Post $post)
     {
-        return response()->json($post->comments()->with(['user','children'])->latest()->get());
+        return response()->json($post->comments()->with(['user','children','parent','children.user'])->latest()->get());
         // return $post->comments()->with('user')->latest()->get();
     }
 
@@ -52,7 +52,7 @@ class CommentController extends Controller
             'body'    => $request->body,
             'user_id' => auth()->user()->id,
         ]);
-        $comment = Comment::where('id', $comment->id)->with('user')->first();
+        $comment = Comment::where('id', $comment->id)->with(['user' , 'children'])->first();
         broadcast(new NewComment($comment))->toOthers();
 
         return $comment->toJson();

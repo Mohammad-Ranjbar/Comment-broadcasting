@@ -1972,6 +1972,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['user', 'post'],
   data: function data() {
@@ -1992,16 +2005,17 @@ __webpack_require__.r(__webpack_exports__);
     this.listUser();
   },
   methods: {
-    ReplyCm: function ReplyCm(id) {
+    ReplyCm: function ReplyCm(id, index) {
       var _this = this;
 
       axios.post('/reply/' + id, {
         body: this.replyComment
       }).then(function (response) {
-        _this.replyComment = '';
+        _this.comments[index].children.push(response.data);
       })["catch"](function (error) {
         console.log(error);
       });
+      this.replyComment = '';
     },
     replyEnable: function replyEnable(id) {
       this.reply = id;
@@ -2015,7 +2029,6 @@ __webpack_require__.r(__webpack_exports__);
         body: this.editComment
       });
       this.edit = {};
-      console.log(index);
     },
     cancelComment: function cancelComment() {
       this.edit = {};
@@ -66692,7 +66705,7 @@ var render = function() {
           ]),
       _vm._v(" "),
       _vm._l(_vm.comments, function(comment, index) {
-        return comment.children.length
+        return typeof comment.parent_id !== "number"
           ? _c(
               "div",
               {
@@ -66703,6 +66716,9 @@ var render = function() {
                 }
               },
               [
+                _vm._v(
+                  "\n        " + _vm._s(typeof comment.parent_id) + "\n        "
+                ),
                 _vm._m(0, true),
                 _vm._v(" "),
                 _c(
@@ -66847,59 +66863,67 @@ var render = function() {
                     ),
                     _vm._v(" "),
                     _vm._l(comment.children, function(child) {
-                      return _vm.reply !== comment.id
-                        ? _c(
-                            "div",
-                            { staticClass: "col-md-6 border border-dark" },
-                            [
-                              _vm._v(
-                                "\n                " +
-                                  _vm._s(child.body) +
-                                  "\n            "
-                              )
-                            ]
-                          )
-                        : _c("div", [
-                            _c("textarea", {
-                              directives: [
-                                {
-                                  name: "model",
-                                  rawName: "v-model",
-                                  value: _vm.replyComment,
-                                  expression: "replyComment"
+                      return _c("div", { staticClass: "media" }, [
+                        _vm._m(1, true),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "media-body" }, [
+                          _c("div", { staticClass: "media-heading" }, [
+                            _vm._v(_vm._s(child.user.name))
+                          ]),
+                          _vm._v(" "),
+                          _c("p", { staticClass: "float-left" }, [
+                            _vm._v(_vm._s(child.body))
+                          ]),
+                          _vm._v(" "),
+                          _c("span", { staticClass: "float-right" }, [
+                            _vm._v(_vm._s(_vm._f("mydate")(child.created_at)))
+                          ])
+                        ])
+                      ])
+                    }),
+                    _vm._v(" "),
+                    _vm.reply == comment.id
+                      ? _c("div", [
+                          _c("textarea", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.replyComment,
+                                expression: "replyComment"
+                              }
+                            ],
+                            attrs: {
+                              name: "reply",
+                              id: "reply",
+                              cols: "80",
+                              rows: "5"
+                            },
+                            domProps: { value: _vm.replyComment },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
                                 }
-                              ],
-                              attrs: {
-                                name: "reply",
-                                id: "reply",
-                                cols: "80",
-                                rows: "5"
-                              },
-                              domProps: { value: _vm.replyComment },
+                                _vm.replyComment = $event.target.value
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-success",
                               on: {
-                                input: function($event) {
-                                  if ($event.target.composing) {
-                                    return
-                                  }
-                                  _vm.replyComment = $event.target.value
+                                click: function($event) {
+                                  return _vm.ReplyCm(comment.id, index)
                                 }
                               }
-                            }),
-                            _vm._v(" "),
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-success",
-                                on: {
-                                  click: function($event) {
-                                    return _vm.ReplyCm(comment.id)
-                                  }
-                                }
-                              },
-                              [_vm._v("ok")]
-                            )
-                          ])
-                    })
+                            },
+                            [_vm._v("ok")]
+                          )
+                        ])
+                      : _vm._e()
                   ],
                   2
                 )
@@ -66912,6 +66936,19 @@ var render = function() {
   )
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "media-left mx-3" }, [
+      _c("a", { attrs: { href: "#" } }, [
+        _c("img", {
+          staticClass: "media-object",
+          attrs: { src: "http://placeimg.com/80/80", alt: "..." }
+        })
+      ])
+    ])
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
