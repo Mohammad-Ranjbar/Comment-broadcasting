@@ -41,16 +41,23 @@
                 <p v-if="edit !== comment.id">
                     {{ comment.body }}
                 </p>
-                <div v-else>
-                    <textarea name="" id="" cols="60" rows="5" v-model="editComment" v-text="comment.body"></textarea>
-                    <button class="btn  btn-primary" @click="updateComment(index , comment.id)">ok</button>
+                <div class="row" v-else>
+                    <div class="col-12">
+                        <textarea name="" id="" cols="100" rows="5" v-model="editComment" v-text="comment.body"></textarea>
+                    </div>
+                    <div class="col-12 mb-4">
+                        <button class="btn  btn-primary mr-1" @click="updateComment(index , comment.id)">ok</button>
+                        <button class="btn  btn-warning" @click="cancelComment()">cancel</button>
+
+                    </div>
                 </div>
 
-                <span style="color: #AAA;" dir="rtl"> {{ comment.created_at | mydate  }}</span>
-                <button class="btn btn-sm btn-danger float-right" v-if="comment.user.id == user.id"
+                <span class="font-weight-bold" dir="rtl"> {{ comment.created_at | mydate  }}</span>
+                <span class="badge badge-warning ml-1" v-if="comment.created_at !== comment.updated_at">edited</span>
+                <button class="btn btn-sm btn-danger float-right" v-if="comment.user.id == user.id && edit !== comment.id"
                         @click="deleteComment(comment.id)">delete
                 </button>
-                <button class="btn btn-sm btn-warning float-right" v-if="comment.user.id == user.id "
+                <button class="btn btn-sm btn-warning float-right" v-if="comment.user.id == user.id && edit !== comment.id"
                         @click="enableUpdate(comment.id)">update
                 </button>
             </div>
@@ -61,7 +68,6 @@
 <script>
 
 	export default {
-
 		props: ['user', 'post'],
 		data() {
 			return {
@@ -70,7 +76,7 @@
 				onlines: {},
 				typing: false,
 				edit: {},
-                editComment:''
+				editComment: '',
 			};
 		},
 
@@ -82,17 +88,20 @@
 		methods: {
 			enableUpdate(id) {
 				this.edit = id;
+
 			},
 			updateComment(index, id) {
 
-				axios.patch('/posts/comments/' + id, {  body: this.editComment})
-					.then(response => {
-								this.comments[index] = response.data;
-						},
-					);
-				this.edit = {};
-				this.getComments();
+				this.comments[index].body = this.editComment;
 
+				axios.patch('/posts/comments/' + id, { body: this.editComment });
+
+				this.edit = {};
+				console.log(index);
+
+			},
+			cancelComment() {
+				this.edit = {};
 			},
 			getComments() {
 
@@ -105,11 +114,12 @@
 					});
 
 			},
-			deleteComment(name, id) {
+			deleteComment(id) {
 				axios.delete('/posts/comment/' + id, { data: { id: 'id' } })
 					.then(
 						this.comments = this.comments.filter(u => (u.id !== id)),
 					);
+
 			},
 
 			postComment() {
@@ -129,6 +139,7 @@
 						this.comments.unshift(comment);
 					});
 			},
+
 			listUser() {
 				Echo.join('online')
 					.here(users => (this.onlines = users))

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Comment;
 use App\Events\NewComment;
+use App\Events\UpdateComment;
 use App\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,19 +16,21 @@ class CommentController extends Controller
         return response()->json($post->comments()->with('user')->latest()->get());
         // return $post->comments()->with('user')->latest()->get();
     }
+
     public function delete($id)
     {
         Comment::find($id)->delete();
-
     }
 
-    public function update($id , Request $request)
+    public function update($id, Request $request)
     {
-       Comment::find($id)->update([
-            'body' => $request->body
-        ]);
-        $comment = Comment::find($id);
-       return $comment;
+       $i= Comment::find($id);
+       $i->body = $request->body;
+       $i->save();
+       dd($i);
+
+
+        return $comment->toJson();
     }
 
     public function store(Request $request, Post $post)
