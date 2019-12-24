@@ -13,8 +13,21 @@ class CommentController extends Controller
 {
     public function index(Post $post)
     {
-        return response()->json($post->comments()->with('user')->latest()->get());
+        return response()->json($post->comments()->with(['user','children'])->latest()->get());
         // return $post->comments()->with('user')->latest()->get();
+    }
+
+    public function reply(Comment $comment, Request $request)
+    {
+
+        $data = $comment->children()->create([
+            'body'      => $request->body,
+            'parent_id' => $comment->id,
+            'post_id' => $comment->post->id,
+            'user_id'   => auth()->user()->id,
+        ]);
+
+        return $data;
     }
 
     public function delete($id)
@@ -24,11 +37,10 @@ class CommentController extends Controller
 
     public function update($id, Request $request)
     {
-       $i= Comment::find($id);
-       $i->body = $request->body;
-       $i->save();
-       dd($i);
-
+        $i       = Comment::find($id);
+        $i->body = $request->body;
+        $i->save();
+        dd($i);
 
         return $comment->toJson();
     }

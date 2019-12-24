@@ -8,6 +8,7 @@
         <span class="label label-success" style="margin-left:15px;" v-if="post.published">Published</span>
 
         <span class="label label-default" style="margin-left:15px;" v-else>Draft</span>
+        <br>
 
         <hr/>
         <p class="lead">
@@ -27,8 +28,8 @@
             <a href="/login">Login Now &gt;&gt;</a>
         </div>
 
-        <div class="media " style="margin-top:20px; background-color: #F3EEF1" v-for="(comment , index) in comments">
-            <div class="media-left mx-3">
+        <div class="media " style="margin-top:20px; background-color: #F3EEF1" v-for="(comment , index) in comments" v-if="comment.children.length">
+            <div class="media-left mx-3" >
 
                 <a href="#">
                     <img class="media-object" src="http://placeimg.com/80/80" alt="...">
@@ -60,8 +61,18 @@
                 <button class="btn btn-sm btn-warning float-right" v-if="comment.user.id == user.id && edit !== comment.id"
                         @click="enableUpdate(comment.id)">update
                 </button>
+                <button class="btn btn-success" @click="replyEnable(comment.id)">reply</button>
+                <div class="col-md-6 border border-dark" v-if="reply !== comment.id" v-for="child in comment.children">
+                    {{child.body}}
+                </div>
+                <div v-else>
+                    <textarea name="reply" id="reply" cols="80" rows="5" v-model="replyComment" ></textarea>
+                    <button class="btn btn-success" @click="ReplyCm(comment.id)">ok</button>
+
+                </div>
             </div>
         </div>
+
     </div>
 </template>
 
@@ -69,6 +80,7 @@
 
 	export default {
 		props: ['user', 'post'],
+
 		data() {
 			return {
 				comments: [],
@@ -77,6 +89,8 @@
 				typing: false,
 				edit: {},
 				editComment: '',
+				reply: {},
+                replyComment:''
 			};
 		},
 
@@ -84,8 +98,21 @@
 			this.getComments();
 			this.listen();
 			this.listUser();
+
 		},
 		methods: {
+			ReplyCm(id){
+				axios.post('/reply/' + id , { body: this.replyComment })
+					.then((response) => {
+						this.replyComment = '';
+					})
+					.catch((error) => {
+						console.log(error);
+					});
+            },
+			replyEnable(id) {
+				this.reply = id;
+			},
 			enableUpdate(id) {
 				this.edit = id;
 
