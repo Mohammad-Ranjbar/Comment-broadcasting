@@ -2012,8 +2012,8 @@ __webpack_require__.r(__webpack_exports__);
         body: this.replyComment
       }).then(function (response) {
         _this.comments[index].children.push(response.data);
-      })["catch"](function (error) {
-        console.log(error);
+
+        console.log(response.data);
       });
       this.replyComment = '';
     },
@@ -66705,7 +66705,7 @@ var render = function() {
           ]),
       _vm._v(" "),
       _vm._l(_vm.comments, function(comment, index) {
-        return typeof comment.parent_id !== "number"
+        return comment.parent_id == null
           ? _c(
               "div",
               {

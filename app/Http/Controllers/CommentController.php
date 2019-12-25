@@ -13,7 +13,7 @@ class CommentController extends Controller
 {
     public function index(Post $post)
     {
-        return response()->json($post->comments()->with(['user','children','parent','children.user'])->latest()->get());
+        return response()->json($post->comments()->with(['user', 'children', 'parent', 'children.user'])->latest()->get());
         // return $post->comments()->with('user')->latest()->get();
     }
 
@@ -23,16 +23,18 @@ class CommentController extends Controller
         $data = $comment->children()->create([
             'body'      => $request->body,
             'parent_id' => $comment->id,
-            'post_id' => $comment->post->id,
+            'post_id'   => $comment->post->id,
             'user_id'   => auth()->user()->id,
         ]);
 
-        return $data;
+        $response = $comment->children()->where('id', $data->id)->with('user')->first();
+
+        return $response;
     }
 
     public function delete($id)
     {
-        Comment::find($id)->delete();
+        Comment::find($id)->with('children')->delete();
     }
 
     public function update($id, Request $request)
@@ -40,7 +42,6 @@ class CommentController extends Controller
         $i       = Comment::find($id);
         $i->body = $request->body;
         $i->save();
-        dd($i);
 
         return $comment->toJson();
     }
@@ -52,7 +53,7 @@ class CommentController extends Controller
             'body'    => $request->body,
             'user_id' => auth()->user()->id,
         ]);
-        $comment = Comment::where('id', $comment->id)->with(['user' , 'children'])->first();
+        $comment = Comment::where('id', $comment->id)->with(['user', 'children'])->first();
         broadcast(new NewComment($comment))->toOthers();
 
         return $comment->toJson();

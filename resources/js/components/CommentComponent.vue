@@ -29,7 +29,7 @@
         </div>
 
         <div class="media " style="margin-top:20px; background-color: #F3EEF1" v-for="(comment , index) in comments"
-           v-if="typeof(comment.parent_id) !== 'number'" >
+           v-if="comment.parent_id == null" >
             {{typeof(comment.parent_id)}}
             <div class="media-left mx-3">
 
@@ -119,10 +119,9 @@
 				axios.post('/reply/' + id, { body: this.replyComment })
 					.then((response) => {
 						this.comments[index].children.push(response.data);
+						console.log(response.data);
 					})
-					.catch((error) => {
-						console.log(error);
-					});
+					;
 				this.replyComment = '';
 			},
 			replyEnable(id) {

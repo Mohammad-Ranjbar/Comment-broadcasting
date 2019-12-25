@@ -2,27 +2,25 @@
 
 namespace App\Providers;
 
+use App\Comment;
+use App\Events\NewComment;
+use Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
+
     public function register()
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
+
     public function boot()
     {
-        //
+        // Comment::created(function ($comment) {
+        //     broadcast(new NewComment($comment))->toOthers();
+        //     return $comment->toJson();
+        // });
     }
 }
