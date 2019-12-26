@@ -104,6 +104,7 @@
 				editComment: '',
 				reply: {},
 				replyComment: '',
+				commentID: {},
 			};
 		},
 
@@ -111,7 +112,7 @@
 			this.getComments();
 			this.listen();
 			this.listUser();
-
+            this.listenDelete()
 		},
 		methods: {
 
@@ -150,11 +151,13 @@
 
 			},
 			deleteComment(id) {
+				this.commentID = id;
+
 				axios.delete('/posts/comment/' + id, { data: { id: 'id' } })
 					.then(
 						this.comments = this.comments.filter(u => (u.id !== id)),
 					);
-
+                this.listenDelete();
 			},
 
 			postComment() {
@@ -163,6 +166,7 @@
 					.then((response) => {
 						this.comments.unshift(response.data);
 						this.commentBox = '';
+
 					})
 					.catch((error) => {
 						console.log(error);
@@ -171,17 +175,36 @@
 			listen() {
 				Echo.private('post.' + this.post.id)
 					.listen('NewComment', (res) => {
-
+						alert('recive a new message !! :)');
 						if (res.parent_id) {
 							this.comments.find((comment) => {
-								if(comment.id == res.parent_id){
+								if (comment.id == res.parent_id) {
 									comment.children.push(res);
-                                }
-                            });
+								}
+							});
 							console.log('this is child');
 						} else {
 							this.comments.unshift(res);
-                            this.getComments();
+							this.getComments();
+						}
+
+					});
+			},
+			listenDelete() {
+				Echo.private('comment')
+					.listen('DeleteComment', (res) => {
+						console.log('delete cm');
+						console.log(res);
+						if (res.parent_id) {
+							this.comments.find((comment) => {
+								if (comment.id == res.parent_id) {
+									comment.children.filter((u) => (u.id !== res.id));
+								}
+							});
+							console.log('delete child');
+						} else {
+							this.comments.filter((u) => (u.id !== res.id));
+							this.getComments();
 						}
 
 					});

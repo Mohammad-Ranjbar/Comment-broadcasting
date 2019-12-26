@@ -18,6 +18,10 @@ Broadcast::channel('post.{id}', function ($user) {
     return auth()->check();
 });
 
+Broadcast::channel('comment', function ($user) {
+    return true;
+});
+
 Broadcast::channel('online', function ($user) {
     if (auth()->check()) {
         return $user->toArray();

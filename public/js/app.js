@@ -1996,13 +1996,15 @@ __webpack_require__.r(__webpack_exports__);
       edit: {},
       editComment: '',
       reply: {},
-      replyComment: ''
+      replyComment: '',
+      commentID: {}
     };
   },
   mounted: function mounted() {
     this.getComments();
     this.listen();
     this.listUser();
+    this.listenDelete();
   },
   methods: {
     ReplyCm: function ReplyCm(id, index) {
@@ -2041,6 +2043,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     deleteComment: function deleteComment(id) {
+      this.commentID = id;
       axios["delete"]('/posts/comment/' + id, {
         data: {
           id: 'id'
@@ -2048,6 +2051,7 @@ __webpack_require__.r(__webpack_exports__);
       }).then(this.comments = this.comments.filter(function (u) {
         return u.id !== id;
       }));
+      this.listenDelete();
     },
     postComment: function postComment() {
       var _this3 = this;
@@ -2066,6 +2070,8 @@ __webpack_require__.r(__webpack_exports__);
       var _this4 = this;
 
       Echo["private"]('post.' + this.post.id).listen('NewComment', function (res) {
+        alert('recive a new message !! :)');
+
         if (res.parent_id) {
           _this4.comments.find(function (comment) {
             if (comment.id == res.parent_id) {
@@ -2081,22 +2087,48 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     },
-    listUser: function listUser() {
+    listenDelete: function listenDelete() {
       var _this5 = this;
 
+      Echo["private"]('comment').listen('DeleteComment', function (res) {
+        console.log('delete cm');
+        console.log(res);
+
+        if (res.parent_id) {
+          _this5.comments.find(function (comment) {
+            if (comment.id == res.parent_id) {
+              comment.children.filter(function (u) {
+                return u.id !== res.id;
+              });
+            }
+          });
+
+          console.log('delete child');
+        } else {
+          _this5.comments.filter(function (u) {
+            return u.id !== res.id;
+          });
+
+          _this5.getComments();
+        }
+      });
+    },
+    listUser: function listUser() {
+      var _this6 = this;
+
       Echo.join('online').here(function (users) {
-        return _this5.onlines = users;
+        return _this6.onlines = users;
       }).joining(function (user) {
-        return _this5.onlines.push(user);
+        return _this6.onlines.push(user);
       }).leaving(function (user) {
-        return _this5.onlines = _this5.onlines.filter(function (u) {
+        return _this6.onlines = _this6.onlines.filter(function (u) {
           return u.id !== user.id;
         });
       }).listenForWhisper('typing', function (response) {
         console.log('is type');
-        _this5.typing = response;
+        _this6.typing = response;
         setTimeout(function () {
-          _this5.typing = false;
+          _this6.typing = false;
         }, 2000);
       });
     },

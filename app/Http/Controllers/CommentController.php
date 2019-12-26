@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Comment;
+use App\Events\DeleteComment;
 use App\Events\NewComment;
 use App\Events\UpdateComment;
 use App\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CommentController extends Controller
 {
@@ -34,7 +36,9 @@ class CommentController extends Controller
 
     public function delete($id)
     {
-        Comment::find($id)->with('children')->delete();
+        Comment::where('id',$id)->delete();
+        broadcast(new DeleteComment($id))->toOthers();
+        // DB::table('comments')->where('id' , $id)->orWhere('parent_id',$id)->delete();
     }
 
     public function update($id, Request $request)

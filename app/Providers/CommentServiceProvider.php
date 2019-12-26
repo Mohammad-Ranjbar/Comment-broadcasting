@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Comment;
+use App\Events\DeleteComment;
 use App\Events\NewComment;
 use Illuminate\Support\ServiceProvider;
 
@@ -29,5 +30,9 @@ class CommentServiceProvider extends ServiceProvider
             broadcast(new NewComment($comment))->toOthers();
 
         });
+
+        // Comment::deleted(function ($comment) {
+        //     broadcast(new DeleteComment($comment))->toOthers();
+        // });
     }
 }
