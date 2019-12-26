@@ -2005,6 +2005,7 @@ __webpack_require__.r(__webpack_exports__);
     this.listen();
     this.listUser();
     this.listenDelete();
+    this.listenUpdate();
   },
   methods: {
     ReplyCm: function ReplyCm(id, index) {
@@ -2029,6 +2030,7 @@ __webpack_require__.r(__webpack_exports__);
         body: this.editComment
       });
       this.edit = {};
+      this.listenUpdate();
     },
     cancelComment: function cancelComment() {
       this.edit = {};
@@ -2113,22 +2115,36 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     },
-    listUser: function listUser() {
+    listenUpdate: function listenUpdate() {
       var _this6 = this;
 
+      Echo["private"]('update').listen('UpdateComment', function (res) {
+        console.log('update cm');
+        console.log(res);
+
+        _this6.comments.find(function (comment) {
+          if (comment.id == res.id) {
+            comment.body = res.body;
+          }
+        });
+      });
+    },
+    listUser: function listUser() {
+      var _this7 = this;
+
       Echo.join('online').here(function (users) {
-        return _this6.onlines = users;
+        return _this7.onlines = users;
       }).joining(function (user) {
-        return _this6.onlines.push(user);
+        return _this7.onlines.push(user);
       }).leaving(function (user) {
-        return _this6.onlines = _this6.onlines.filter(function (u) {
+        return _this7.onlines = _this7.onlines.filter(function (u) {
           return u.id !== user.id;
         });
       }).listenForWhisper('typing', function (response) {
         console.log('is type');
-        _this6.typing = response;
+        _this7.typing = response;
         setTimeout(function () {
-          _this6.typing = false;
+          _this7.typing = false;
         }, 2000);
       });
     },

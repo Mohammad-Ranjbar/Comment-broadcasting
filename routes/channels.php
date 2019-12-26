@@ -21,6 +21,9 @@ Broadcast::channel('post.{id}', function ($user) {
 Broadcast::channel('comment', function ($user) {
     return true;
 });
+Broadcast::channel('update', function ($user) {
+    return true;
+});
 
 Broadcast::channel('online', function ($user) {
     if (auth()->check()) {

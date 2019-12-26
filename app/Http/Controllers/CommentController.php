@@ -43,10 +43,10 @@ class CommentController extends Controller
 
     public function update($id, Request $request)
     {
-        $i       = Comment::find($id);
-        $i->body = $request->body;
-        $i->save();
-
+        $comment       = Comment::find($id);
+        $comment->body = $request->body;
+        $comment->save();
+        broadcast(new UpdateComment($comment));
         return $comment->toJson();
     }
 

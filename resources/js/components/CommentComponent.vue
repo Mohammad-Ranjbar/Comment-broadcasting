@@ -112,7 +112,8 @@
 			this.getComments();
 			this.listen();
 			this.listUser();
-            this.listenDelete()
+			this.listenDelete();
+			this.listenUpdate();
 		},
 		methods: {
 
@@ -136,6 +137,7 @@
 				this.comments[index].body = this.editComment;
 				axios.patch('/posts/comments/' + id, { body: this.editComment });
 				this.edit = {};
+				this.listenUpdate();
 			},
 			cancelComment() {
 				this.edit = {};
@@ -157,7 +159,7 @@
 					.then(
 						this.comments = this.comments.filter(u => (u.id !== id)),
 					);
-                this.listenDelete();
+				this.listenDelete();
 			},
 
 			postComment() {
@@ -206,6 +208,20 @@
 							this.comments.filter((u) => (u.id !== res.id));
 							this.getComments();
 						}
+
+					});
+			},
+			listenUpdate() {
+				Echo.private('update')
+					.listen('UpdateComment', (res) => {
+						console.log('update cm');
+						console.log(res);
+
+							this.comments.find((comment) => {
+								if (comment.id == res.id) {
+									comment.body = res.body;
+								}
+							});
 
 					});
 			},
