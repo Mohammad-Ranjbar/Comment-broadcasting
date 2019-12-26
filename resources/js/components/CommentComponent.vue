@@ -29,7 +29,7 @@
         </div>
 
         <div class="media " style="margin-top:20px; background-color: #F3EEF1" v-for="(comment , index) in comments"
-           v-if="comment.parent_id == null" >
+             v-if="comment.parent_id == null">
             {{typeof(comment.parent_id)}}
             <div class="media-left mx-3">
 
@@ -64,18 +64,18 @@
                         @click="enableUpdate(comment.id)">update
                 </button>
                 <button class="btn btn-success" @click="replyEnable(comment.id)">reply</button>
-                <div class="media" v-for="child in comment.children">
+                <div class="media my-1" v-for="child in comment.children">
                     <div class="media-left mx-3">
 
                         <a href="#">
                             <img class="media-object" src="http://placeimg.com/80/80" alt="...">
                         </a>
                     </div>
-                <div class="media-body">
-                    <div class="media-heading">{{child.user.name}}</div>
-                    <p class="float-left">{{child.body}}</p>
-                    <span class="float-right">{{child.created_at | mydate}}</span>
-                </div>
+                    <div class="media-body">
+                        <div class="media-heading">{{child.user.name}}</div>
+                        <p class="float-left">{{child.body}}</p>
+                        <span class="float-right">{{child.created_at | mydate}}</span>
+                    </div>
 
                 </div>
                 <div v-if="reply == comment.id">
@@ -119,9 +119,9 @@
 				axios.post('/reply/' + id, { body: this.replyComment })
 					.then((response) => {
 						this.comments[index].children.push(response.data);
-						console.log(response.data);
+
 					})
-					;
+				;
 				this.replyComment = '';
 			},
 			replyEnable(id) {
@@ -170,8 +170,20 @@
 			},
 			listen() {
 				Echo.private('post.' + this.post.id)
-					.listen('NewComment', (comment) => {
-						this.comments.unshift(comment);
+					.listen('NewComment', (res) => {
+
+						if (res.parent_id) {
+							this.comments.find((comment) => {
+								if(comment.id == res.parent_id){
+									comment.children.push(res);
+                                }
+                            });
+							console.log('this is child');
+						} else {
+							this.comments.unshift(res);
+                            this.getComments();
+						}
+
 					});
 			},
 

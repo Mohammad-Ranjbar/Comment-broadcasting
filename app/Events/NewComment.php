@@ -11,6 +11,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use function MongoDB\BSON\toJSON;
 
 class NewComment implements ShouldBroadcast
 {
@@ -22,7 +23,7 @@ class NewComment implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(Comment $comment)
+    public function __construct($comment)
     {
         $this->comment = $comment;
     }
@@ -41,7 +42,9 @@ class NewComment implements ShouldBroadcast
     {
         return [
             'body'       => $this->comment->body,
+            'parent_id'  => $this->comment->parent_id,
             'created_at' => $this->comment->created_at,
+            'updated_at' => $this->comment->updated_at,
             'user'       => [
                 'name'   => $this->comment->user->name,
                 'avatar' => 'http://lorempixel/50/50',

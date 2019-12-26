@@ -54,7 +54,7 @@ class CommentController extends Controller
             'user_id' => auth()->user()->id,
         ]);
         $comment = Comment::where('id', $comment->id)->with(['user', 'children'])->first();
-        broadcast(new NewComment($comment))->toOthers();
+        // broadcast(new NewComment($comment))->toOthers();
 
         return $comment->toJson();
     }

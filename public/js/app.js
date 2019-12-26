@@ -2012,8 +2012,6 @@ __webpack_require__.r(__webpack_exports__);
         body: this.replyComment
       }).then(function (response) {
         _this.comments[index].children.push(response.data);
-
-        console.log(response.data);
       });
       this.replyComment = '';
     },
@@ -2067,8 +2065,20 @@ __webpack_require__.r(__webpack_exports__);
     listen: function listen() {
       var _this4 = this;
 
-      Echo["private"]('post.' + this.post.id).listen('NewComment', function (comment) {
-        _this4.comments.unshift(comment);
+      Echo["private"]('post.' + this.post.id).listen('NewComment', function (res) {
+        if (res.parent_id) {
+          _this4.comments.find(function (comment) {
+            if (comment.id == res.parent_id) {
+              comment.children.push(res);
+            }
+          });
+
+          console.log('this is child');
+        } else {
+          _this4.comments.unshift(res);
+
+          _this4.getComments();
+        }
       });
     },
     listUser: function listUser() {
@@ -66863,7 +66873,7 @@ var render = function() {
                     ),
                     _vm._v(" "),
                     _vm._l(comment.children, function(child) {
-                      return _c("div", { staticClass: "media" }, [
+                      return _c("div", { staticClass: "media my-1" }, [
                         _vm._m(1, true),
                         _vm._v(" "),
                         _c("div", { staticClass: "media-body" }, [
