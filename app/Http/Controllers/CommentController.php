@@ -36,9 +36,8 @@ class CommentController extends Controller
 
     public function delete($id)
     {
-        Comment::where('id',$id)->delete();
+        DB::table('comments')->where('id', $id)->orWhere('parent_id', $id)->delete();
         broadcast(new DeleteComment($id))->toOthers();
-        // DB::table('comments')->where('id' , $id)->orWhere('parent_id',$id)->delete();
     }
 
     public function update($id, Request $request)
@@ -47,6 +46,7 @@ class CommentController extends Controller
         $comment->body = $request->body;
         $comment->save();
         broadcast(new UpdateComment($comment));
+
         return $comment->toJson();
     }
 
@@ -58,8 +58,8 @@ class CommentController extends Controller
             'user_id' => auth()->user()->id,
         ]);
         $comment = Comment::where('id', $comment->id)->with(['user', 'children'])->first();
-        // broadcast(new NewComment($comment))->toOthers();
 
+        // broadcast(new NewComment($comment))->toOthers();
         return $comment->toJson();
     }
 }

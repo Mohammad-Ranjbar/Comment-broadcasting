@@ -2072,16 +2072,12 @@ __webpack_require__.r(__webpack_exports__);
       var _this4 = this;
 
       Echo["private"]('post.' + this.post.id).listen('NewComment', function (res) {
-        alert('recive a new message !! :)');
-
         if (res.parent_id) {
           _this4.comments.find(function (comment) {
             if (comment.id == res.parent_id) {
               comment.children.push(res);
             }
           });
-
-          console.log('this is child');
         } else {
           _this4.comments.unshift(res);
 

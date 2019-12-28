@@ -31,8 +31,6 @@ class CommentServiceProvider extends ServiceProvider
 
         });
 
-        // Comment::deleted(function ($comment) {
-        //     broadcast(new DeleteComment($comment))->toOthers();
-        // });
+
     }
 }

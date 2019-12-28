@@ -177,19 +177,16 @@
 			listen() {
 				Echo.private('post.' + this.post.id)
 					.listen('NewComment', (res) => {
-						alert('recive a new message !! :)');
 						if (res.parent_id) {
 							this.comments.find((comment) => {
 								if (comment.id == res.parent_id) {
 									comment.children.push(res);
 								}
 							});
-							console.log('this is child');
 						} else {
 							this.comments.unshift(res);
 							this.getComments();
 						}
-
 					});
 			},
 			listenDelete() {
