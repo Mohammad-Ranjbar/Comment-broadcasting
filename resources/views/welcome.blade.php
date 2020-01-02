@@ -78,9 +78,21 @@
                 @endauth
             </div>
         @endif
-
+            <br><br><br>
         <div class="content">
+            <table class="table">
+                <thead class="text-primary">
+                    <th>
+                        name
+                    </th>
+                    <th>
+                        email
+                    </th>
+                </thead>
+                <tbody>
 
+                </tbody>
+            </table>
         </div>
     </div>
 </body>

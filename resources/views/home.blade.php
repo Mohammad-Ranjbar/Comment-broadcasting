@@ -10,17 +10,18 @@
                     <div class="card-body">
 
                         <a href="/posts/2">Post test</a>
+                        <br>
+                        <a href="/form" class="btn"> فرم ثبت نام</a>
                         <div>
                             <autocomplete></autocomplete>
                         </div>
                     </div>
-                    <div class="card-footer">
-                        <passport-clients></passport-clients>
-                        <passport-authorized-clients></passport-authorized-clients>
-                        <passport-personal-access-tokens></passport-personal-access-tokens>
-                    </div>
+
                 </div>
             </div>
+
         </div>
+
+
     </div>
 @endsection
