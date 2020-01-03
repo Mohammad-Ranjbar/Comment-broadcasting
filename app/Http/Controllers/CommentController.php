@@ -15,8 +15,24 @@ class CommentController extends Controller
 {
     public function index(Post $post)
     {
-        return response()->json($post->comments()->with(['user', 'children', 'parent', 'children.user'])->latest()->get());
-        // return $post->comments()->with('user')->latest()->get();
+        // return response()->json($post->comments()->with(['user', 'children', 'parent', 'children.user'])->latest()->paginate(5));
+        $posts = $post->comments()->with(['user', 'children', 'parent', 'children.user'])->latest()->paginate(5);
+       $response = [
+           'data' => $posts ,
+            'pagination' => [
+                'total' => $posts->total(),
+                'per_page' => $posts->perPage(),
+                'current_page' => $posts->currentPage(),
+                'last_page' => $posts->lastPage(),
+                'from' => $posts->firstItem(),
+                'to' => $posts->lastItem(),
+                'next_page' => $posts->nextPageUrl(),
+                'prev_page' => $posts->previousPageUrl(),
+            ]
+
+        ];
+        return response()->json($response);
+
     }
 
     public function reply(Comment $comment, Request $request)

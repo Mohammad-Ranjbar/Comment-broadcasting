@@ -14,6 +14,7 @@
         <p class="lead">
             {{post.content}}
         </p>
+
         <hr/>
 
         <h3>Comments:</h3>
@@ -39,7 +40,9 @@
             </div>
             <div class="media-body">
 
-                <h4 class="media-heading "> {{comment.user.name}} said ... </h4>
+                <h4 class="media-heading "> {{comment.user.name}}
+                    <mark>said ...</mark>
+                </h4>
 
                 <p v-if="edit !== comment.id">
                     {{ comment.body }}
@@ -85,7 +88,18 @@
                 </div>
             </div>
         </div>
+        <br>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item ">
+                    <a class="page-link" @click="getComments(pagination.prev_page)" tabindex="-1" v-if="pagination.prev_page">Previous</a>
+                </li>
 
+                <li class="page-item">
+                    <a class="page-link" @click="getComments(pagination.next_page)" v-if="pagination.next_page">next</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </template>
 
@@ -105,6 +119,7 @@
 				reply: {},
 				replyComment: '',
 				commentID: {},
+				pagination: {},
 			};
 		},
 
@@ -142,15 +157,27 @@
 			cancelComment() {
 				this.edit = {};
 			},
-			getComments() {
-				axios.get('/api/posts/' + this.post.id + '/comments')
-					.then((response) => {
-						this.comments = response.data;
-					})
-					.catch(function (error) {
-						console.log(error);
-					});
-
+			getComments(page) {
+				if (page) {
+					axios.get(page)
+						.then((response) => {
+							this.comments   = response.data.data.data;
+							this.pagination = response.data.pagination;
+						})
+						.catch(function (error) {
+							console.log(error);
+						});
+				} else {
+					axios.get('/api/posts/' + this.post.id + '/comments')
+						.then((response) => {
+							this.comments   = response.data.data.data;
+							this.pagination = response.data.pagination;
+                            console.log(response.data.pagination.next_page);
+						})
+						.catch(function (error) {
+							console.log(error);
+						});
+				}
 			},
 			deleteComment(id) {
 				this.commentID = id;
@@ -214,11 +241,11 @@
 						console.log('update cm');
 						console.log(res);
 
-							this.comments.find((comment) => {
-								if (comment.id == res.id) {
-									comment.body = res.body;
-								}
-							});
+						this.comments.find((comment) => {
+							if (comment.id == res.id) {
+								comment.body = res.body;
+							}
+						});
 
 					});
 			},

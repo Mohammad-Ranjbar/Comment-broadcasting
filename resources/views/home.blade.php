@@ -9,7 +9,7 @@
 
                     <div class="card-body">
 
-                        <a href="/posts/2">Post test</a>
+                        <a href="/posts/1">Post test</a>
                         <br>
                         <a href="/form" class="btn"> فرم ثبت نام</a>
                         <div>

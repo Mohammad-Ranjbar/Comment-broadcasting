@@ -1985,6 +1985,20 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['user', 'post'],
   data: function data() {
@@ -1997,7 +2011,8 @@ __webpack_require__.r(__webpack_exports__);
       editComment: '',
       reply: {},
       replyComment: '',
-      commentID: {}
+      commentID: {},
+      pagination: {}
     };
   },
   mounted: function mounted() {
@@ -2035,14 +2050,25 @@ __webpack_require__.r(__webpack_exports__);
     cancelComment: function cancelComment() {
       this.edit = {};
     },
-    getComments: function getComments() {
+    getComments: function getComments(page) {
       var _this2 = this;
 
-      axios.get('/api/posts/' + this.post.id + '/comments').then(function (response) {
-        _this2.comments = response.data;
-      })["catch"](function (error) {
-        console.log(error);
-      });
+      if (page) {
+        axios.get(page).then(function (response) {
+          _this2.comments = response.data.data.data;
+          _this2.pagination = response.data.pagination;
+        })["catch"](function (error) {
+          console.log(error);
+        });
+      } else {
+        axios.get('/api/posts/' + this.post.id + '/comments').then(function (response) {
+          _this2.comments = response.data.data.data;
+          _this2.pagination = response.data.pagination;
+          console.log(response.data.pagination.next_page);
+        })["catch"](function (error) {
+          console.log(error);
+        });
+      }
     },
     deleteComment: function deleteComment(id) {
       this.commentID = id;
@@ -66780,7 +66806,10 @@ var render = function() {
                   { staticClass: "media-body" },
                   [
                     _c("h4", { staticClass: "media-heading " }, [
-                      _vm._v(" " + _vm._s(comment.user.name) + " said ... ")
+                      _vm._v(
+                        " " + _vm._s(comment.user.name) + "\n                "
+                      ),
+                      _c("mark", [_vm._v("said ...")])
                     ]),
                     _vm._v(" "),
                     _vm.edit !== comment.id
@@ -66984,7 +67013,48 @@ var render = function() {
               ]
             )
           : _vm._e()
-      })
+      }),
+      _vm._v(" "),
+      _c("br"),
+      _vm._v(" "),
+      _c("nav", { attrs: { "aria-label": "Page navigation example" } }, [
+        _c("ul", { staticClass: "pagination justify-content-center" }, [
+          _c("li", { staticClass: "page-item " }, [
+            _vm.pagination.prev_page
+              ? _c(
+                  "a",
+                  {
+                    staticClass: "page-link",
+                    attrs: { tabindex: "-1" },
+                    on: {
+                      click: function($event) {
+                        return _vm.getComments(_vm.pagination.prev_page)
+                      }
+                    }
+                  },
+                  [_vm._v("Previous")]
+                )
+              : _vm._e()
+          ]),
+          _vm._v(" "),
+          _c("li", { staticClass: "page-item" }, [
+            _vm.pagination.next_page
+              ? _c(
+                  "a",
+                  {
+                    staticClass: "page-link",
+                    on: {
+                      click: function($event) {
+                        return _vm.getComments(_vm.pagination.next_page)
+                      }
+                    }
+                  },
+                  [_vm._v("next")]
+                )
+              : _vm._e()
+          ])
+        ])
+      ])
     ],
     2
   )
