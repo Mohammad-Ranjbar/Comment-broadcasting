@@ -5,7 +5,9 @@ use App\User;
 Route::get('/', function () {
     return view('home');
 });
-
+Route::get('/sidebar', function () {
+    return view('sidebar');
+});
 Route::post('/form','FormController@store')->name('form');
 Auth::routes();
 

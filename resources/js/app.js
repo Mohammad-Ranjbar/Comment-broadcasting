@@ -8,6 +8,8 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 import moment from 'moment';
+import BackToTop from 'vue-backtotop';
+Vue.use(BackToTop);
 Vue.filter('mydate', (create) => {
 
    return moment(create).local('fa').fromNow();
